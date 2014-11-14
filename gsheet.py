@@ -28,10 +28,9 @@ def main():
     entertainment = get_local_gsheet("data/entertainment.json")
     sport = get_local_gsheet("data/sport.json")
 
-    person_list = []
-    person_list.append(get_persons(business, "Business")[0])
-    person_list.append(get_persons(entertainment, "Entertainment")[0])
-    person_list.append(get_persons(sport, "Sport")[0])
+    person_list = get_persons([(business, "Business"),
+                               (entertainment, "Entertainment"),
+                               (sport, "Sport")])
 
     with open('output.json', 'w') as outfile:
         json.dump(person_list, outfile)
@@ -66,20 +65,21 @@ def get_local_gsheet(s=None):
     return json.loads(gsheet.read())["feed"]["entry"]
 
 
-def get_persons(gsheet, sheet_type="Business"):
+def get_persons(spreads):
     """Maps and returns the useful data from a persons"""
     blah = []
-    for person in gsheet:
-        blah.append({'name': person["gsx$name"]["$t"],
-                     'firstName': person["gsx$name"]["$t"].split()[0],
-                     'jobTitle': person["gsx$jobtitle"]["$t"],
-                     'income': person["gsx$earntin7mins"]["$t"],
-                     'netWorth': person["gsx$networth"]["$t"],
-                     'source': person["gsx$source"]["$t"],
-                     'img': "img/" + person["gsx$name"]["$t"] + ".jpg",
-                     'group': sheet_type,
-                     'socialData': {'twitterHandler': person["gsx$twitterhandle"]["$t"]}
-                     })
+    for gsheet, sheet_type in spreads:
+        for person in gsheet:
+            blah.append({'name': person["gsx$name"]["$t"],
+                         'firstName': person["gsx$name"]["$t"].split()[0],
+                         'jobTitle': person["gsx$jobtitle"]["$t"],
+                         'income': person["gsx$earntin7mins"]["$t"],
+                         'netWorth': person["gsx$networth"]["$t"],
+                         'source': person["gsx$source"]["$t"],
+                         'img': "img/" + person["gsx$name"]["$t"] + ".jpg",
+                         'group': sheet_type,
+                         'socialData': {'twitterHandler': person["gsx$twitterhandle"]["$t"]}
+                         })
 
     return blah
 
