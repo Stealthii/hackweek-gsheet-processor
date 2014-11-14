@@ -27,7 +27,19 @@ def main():
     business = get_local_gsheet("data/business.json")
     entertainment = get_local_gsheet("data/entertainment.json")
     sport = get_local_gsheet("data/sport.json")
-    log(query_person("Bill Gates", business, fmt=None))
+
+    person_list = []
+    person_list.append(get_persons(business, "Business")[0])
+    person_list.append(get_persons(entertainment, "Entertainment")[0])
+    person_list.append(get_persons(sport, "Sport")[0])
+
+    with open('output.json', 'w') as outfile:
+        json.dump(person_list, outfile)
+    # hmm = json.dumps([dict(mpn=pn) for pn in person_list])
+
+    # log(hmm)
+
+    # log(query_person("Bill Gates", business, fmt=None))
     # log(entertainment)
     # log(sport)
 
@@ -52,6 +64,24 @@ def get_local_gsheet(s=None):
 
     gsheet = open(json_file)
     return json.loads(gsheet.read())["feed"]["entry"]
+
+
+def get_persons(gsheet, sheet_type="Business"):
+    """Maps and returns the useful data from a persons"""
+    blah = []
+    for person in gsheet:
+        blah.append({'name': person["gsx$name"]["$t"],
+                     'firstName': person["gsx$name"]["$t"].split()[0],
+                     'jobTitle': "(unavailable)",
+                     'income': person["gsx$earntin7mins"]["$t"],
+                     'netWorth': person["gsx$networth"]["$t"],
+                     'source': "Forbes",
+                     'img': "img/" + person["gsx$name"]["$t"] + ".jpg",
+                     'group': sheet_type,
+                     'socialData': {'twitterHandler': person["gsx$twitterhandle"]["$t"]}
+                     })
+
+    return blah
 
 
 def query_person(info, person_list, fmt):
