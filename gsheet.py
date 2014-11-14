@@ -72,10 +72,10 @@ def get_persons(gsheet, sheet_type="Business"):
     for person in gsheet:
         blah.append({'name': person["gsx$name"]["$t"],
                      'firstName': person["gsx$name"]["$t"].split()[0],
-                     'jobTitle': "(unavailable)",
+                     'jobTitle': person["gsx$jobtitle"]["$t"],
                      'income': person["gsx$earntin7mins"]["$t"],
                      'netWorth': person["gsx$networth"]["$t"],
-                     'source': "Forbes",
+                     'source': person["gsx$source"]["$t"],
                      'img': "img/" + person["gsx$name"]["$t"] + ".jpg",
                      'group': sheet_type,
                      'socialData': {'twitterHandler': person["gsx$twitterhandle"]["$t"]}
