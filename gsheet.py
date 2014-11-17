@@ -76,7 +76,7 @@ def get_persons(spreads):
                          'income': person["gsx$earntin7mins"]["$t"],
                          'netWorth': person["gsx$networth"]["$t"],
                          'source': person["gsx$source"]["$t"],
-                         'img': "img/" + person["gsx$name"]["$t"] + ".jpg",
+                         'img': "img/person/" + person["gsx$name"]["$t"].replace(' ', '_').lower() + ".jpg",
                          'group': sheet_type,
                          'socialData': {'twitterHandler': person["gsx$twitterhandle"]["$t"]}
                          })
