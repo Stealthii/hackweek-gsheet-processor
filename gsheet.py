@@ -33,7 +33,7 @@ def main():
                                (sport, "Sport")])
 
     with open('output.json', 'w') as outfile:
-        json.dump(person_list, outfile)
+        json.dump(person_list, outfile, sort_keys=True, indent=4, separators=(',', ': '))
     # hmm = json.dumps([dict(mpn=pn) for pn in person_list])
 
     # log(hmm)
