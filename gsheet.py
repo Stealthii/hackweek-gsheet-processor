@@ -24,23 +24,12 @@ import sys
 
 
 def main():
-    business = get_local_gsheet("data/business.json")
-    entertainment = get_local_gsheet("data/entertainment.json")
-    sport = get_local_gsheet("data/sport.json")
+    matrix = get_local_gsheet("data/matrix_export.json")
 
-    person_list = get_persons([(business, "Business"),
-                               (entertainment, "Entertainment"),
-                               (sport, "Sport")])
+    phone_list = get_phones(matrix)
 
     with open('output.json', 'w') as outfile:
-        json.dump(person_list, outfile, sort_keys=True, indent=4, separators=(',', ': '))
-    # hmm = json.dumps([dict(mpn=pn) for pn in person_list])
-
-    # log(hmm)
-
-    # log(query_person("Bill Gates", business, fmt=None))
-    # log(entertainment)
-    # log(sport)
+        json.dump(phone_list, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 # def get_gsheet(s=None):
@@ -65,52 +54,44 @@ def get_local_gsheet(s=None):
     return json.loads(gsheet.read())["feed"]["entry"]
 
 
-def get_persons(spreads):
-    """Maps and returns the useful data from a persons"""
+def get_phones(gsheet):
+    """Maps and returns the useful data from the phone list"""
     blah = []
-    for gsheet, sheet_type in spreads:
-        for person in gsheet:
-            blah.append({'name': person["gsx$name"]["$t"],
-                         'firstName': person["gsx$name"]["$t"].split()[0],
-                         'jobTitle': person["gsx$jobtitle"]["$t"],
-                         'income': person["gsx$earntin7mins"]["$t"],
-                         'netWorth': person["gsx$networth"]["$t"],
-                         'source': person["gsx$source"]["$t"],
-                         'img': "img/person/" + person["gsx$name"]["$t"].replace(' ', '_').lower() + ".jpg",
-                         'group': sheet_type,
-                         'socialData': {'twitterHandler': person["gsx$twitterhandle"]["$t"]}
-                         })
+    for phone in gsheet:
+        blah.append({'name': phone["gsx$phone"]["$t"],
+                     'social_guru': {
+                         'share': phone["gsx$share"]["$t"],
+                         'chat': phone["gsx$chat"]["$t"],
+                         'browse': phone["gsx$browse"]["$t"]},
+                     'commuter': {
+                         'play_music': phone["gsx$playmusic"]["$t"],
+                         'read_books': phone["gsx$readbooks"]["$t"],
+                         'games': phone["gsx$games"]["$t"]},
+                     'professional': {
+                         'multi_task': phone["gsx$multitask"]["$t"],
+                         'navigate': phone["gsx$navigate"]["$t"],
+                         'longevity': phone["gsx$longevity"]["$t"]},
+                     'pic_buff': {
+                         'photos': phone["gsx$photos"]["$t"],
+                         'video': phone["gsx$video"]["$t"],
+                         'hd_playback': phone["gsx$hdplayback"]["$t"]},
+                     'g-fan': {
+                         'gfan': phone["gsx$gfan"]["$t"]},
+                     'outdoor': {
+                         'play_outdoors': phone["gsx$playoutdoors"]["$t"],
+                         'long_trips': phone["gsx$longtrips"]["$t"],
+                         'exploring': phone["gsx$exploring"]["$t"]},
+                     'simple': {
+                         'calls': phone["gsx$calls"]["$t"],
+                         'save_money': phone["gsx$savemoney"]["$t"],
+                         'sms': phone["gsx$sms"]["$t"]},
+                     'techie': {
+                         'latest': phone["gsx$latest"]["$t"],
+                         'customise': phone["gsx$customise"]["$t"],
+                         'download': phone["gsx$download"]["$t"]}
+                     })
 
     return blah
-
-
-def query_person(info, person_list, fmt):
-    """Returns first person that matches info
-    TODO: Vastly improve the logic here
-
-    """
-    try:
-        return [show_person(person, fmt)
-                for person in person_list
-                if person["gsx$name"]["$t"] == info][0]
-    except IndexError:
-        return None
-
-
-def show_person(person, fmt):
-    """Returns a person"""
-    if fmt == "json":
-        return person  # Close enough
-    else:
-        return u"\n".join(map(unicode, ["Name: " + person["gsx$name"]["$t"],
-                                        "First Name: " + person["gsx$name"]["$t"].split()[0],
-                                        "Job Title: (unavailable)",
-                                        "Income: " + person["gsx$earntin7mins"]["$t"],
-                                        "Net Worth: " + person["gsx$networth"]["$t"],
-                                        "Source: (unavailable)",
-                                        "Img: img/" + person["gsx$name"]["$t"] + ".jpg",
-                                        "Group: Business",
-                                        "Twitter: " + person["gsx$twitterhandle"]["$t"]]))
 
 
 def log_error(*objs):
